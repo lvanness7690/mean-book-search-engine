@@ -7,7 +7,7 @@ const resolvers = {
     // Get the current user
     me: async (parent, args, context) => {
       if (context.user) {
-        return await User.findOne({ _id: context.user._id }).populate('savedBooks');
+        return await User.findById(context.user._id).populate('savedBooks');
       }
       throw new AuthenticationError('You need to be logged in!');
     },
@@ -30,37 +30,46 @@ const resolvers = {
       return { token, user };
     },
 
-    // Add a new user
-    addUser: async (parent, args) => {
-      const user = await User.create(args);
-      const token = signToken(user);
-      return { token, user };
-    },
+    // Add a new user (addUser mutation should be implemented)
 
     // Save a book
     saveBook: async (parent, { input }, context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate(
-          { _id: context.user._id },
-          { $push: { savedBooks: input } },
-          { new: true, runValidators: true }
-        ).populate('savedBooks');
-        return updatedUser;
+        try {
+          // Find the user by ID and update their savedBooks array
+          const updatedUser = await User.findByIdAndUpdate(
+            context.user._id,
+            { $push: { savedBooks: input } },
+            { new: true }
+          ).populate('savedBooks');
+
+          return updatedUser;
+        } catch (error) {
+          // Handle any errors
+          throw new Error('Failed to save the book.');
+        }
       }
-      throw new AuthenticationError('You need to be logged in!');
+      throw new AuthenticationError('You need to be logged in to save a book.');
     },
 
     // Remove a book
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
-        const updatedUser = await User.findByIdAndUpdate(
-          { _id: context.user._id },
-          { $pull: { savedBooks: { bookId } } },
-          { new: true }
-        ).populate('savedBooks');
-        return updatedUser;
+        try {
+          // Find the user by ID and update their savedBooks array
+          const updatedUser = await User.findByIdAndUpdate(
+            context.user._id,
+            { $pull: { savedBooks: { bookId } } },
+            { new: true }
+          ).populate('savedBooks');
+
+          return updatedUser;
+        } catch (error) {
+          // Handle any errors
+          throw new Error('Failed to remove the book.');
+        }
       }
-      throw new AuthenticationError('You need to be logged in!');
+      throw new AuthenticationError('You need to be logged in to remove a book.');
     },
   },
 };
