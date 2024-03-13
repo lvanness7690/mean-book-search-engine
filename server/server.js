@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const { ApolloServer } = require('apollo-server-express');
-const { typeDefs, resolvers } = require('./schemas'); // Ensure you have your GraphQL schema setup here
+const { typeDefs, resolvers } = require('./schemas'); 
 const db = require('./config/connection');
 
 const app = express();
