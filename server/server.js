@@ -6,7 +6,7 @@ const { authMiddleware } = require('./utils/auth'); // Assuming you have an auth
 const path = require('path');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3001; // Use port 3001 by default for local development
 
 async function startApolloServer(typeDefs, resolvers) {
   const server = new ApolloServer({
@@ -22,11 +22,13 @@ async function startApolloServer(typeDefs, resolvers) {
   app.use(express.json());
 
   if (process.env.NODE_ENV === 'production') {
+    // Serve static assets from the client build folder
     app.use(express.static(path.join(__dirname, '../client/build')));
   }
 
+  // Start the server
   db.once('open', () => {
-    app.listen(PORT, () => console.log(`🌍 Now listening on localhost:${PORT}${server.graphqlPath}`));
+    app.listen(PORT, () => console.log(`🌍 Now listening on port ${PORT}`));
   });
 }
 
