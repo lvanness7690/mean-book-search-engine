@@ -1,10 +1,9 @@
 const { AuthenticationError } = require('apollo-server-express');
-const { User } = require('../models'); // Adjust this path as needed
-const { signToken } = require('../utils/auth'); // Assuming you have a utility for JWT
+const { User } = require('../models');
+const { signToken } = require('../utils/auth');
 
 const resolvers = {
   Query: {
-    // Get the current user
     me: async (parent, args, context) => {
       if (context.user) {
         return await User.findById(context.user._id).populate('savedBooks');
@@ -14,7 +13,6 @@ const resolvers = {
   },
 
   Mutation: {
-    // User login
     login: async (parent, { email, password }) => {
       const user = await User.findOne({ email });
       if (!user) {
@@ -30,13 +28,20 @@ const resolvers = {
       return { token, user };
     },
 
-    // Add a new user (addUser mutation should be implemented)
+    addUser: async (parent, { username, email, password }) => {
+      try {
+        const user = await User.create({ username, email, password });
+        const token = signToken(user);
+        return { token, user };
+      } catch (error) {
+        console.error(error);
+        throw new Error('Failed to create a new user.');
+      }
+    },
 
-    // Save a book
     saveBook: async (parent, { input }, context) => {
       if (context.user) {
         try {
-          // Find the user by ID and update their savedBooks array
           const updatedUser = await User.findByIdAndUpdate(
             context.user._id,
             { $push: { savedBooks: input } },
@@ -45,18 +50,15 @@ const resolvers = {
 
           return updatedUser;
         } catch (error) {
-          // Handle any errors
           throw new Error('Failed to save the book.');
         }
       }
       throw new AuthenticationError('You need to be logged in to save a book.');
     },
 
-    // Remove a book
     removeBook: async (parent, { bookId }, context) => {
       if (context.user) {
         try {
-          // Find the user by ID and update their savedBooks array
           const updatedUser = await User.findByIdAndUpdate(
             context.user._id,
             { $pull: { savedBooks: { bookId } } },
@@ -65,7 +67,6 @@ const resolvers = {
 
           return updatedUser;
         } catch (error) {
-          // Handle any errors
           throw new Error('Failed to remove the book.');
         }
       }

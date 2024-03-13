@@ -6,14 +6,26 @@ import Auth from '../utils/auth';
 
 const SignupForm = () => {
   const [userFormData, setUserFormData] = useState({ username: '', email: '', password: '' });
-  const [validated] = useState(false);
+  const [validated, setValidated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
   const [addUser] = useMutation(ADD_USER, {
     onCompleted: (data) => {
-      Auth.login(data.addUser.token);
+      console.log('Mutation data:', data); // Log the mutation response
+      const token = data?.addUser?.token;
+      if (token) {
+        Auth.login(token);
+      } else {
+        setShowAlert(true);
+      }
+    },
+    onError: (error) => {
+      console.error(error);
+      setShowAlert(true);
     }
   });
+  
+  
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -22,12 +34,24 @@ const SignupForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
+    const form = event.currentTarget;
+    if (form.checkValidity() === false) {
+      event.stopPropagation();
+      setValidated(true);
+      return;
+    }
     try {
-      await addUser({
+      const { data } = await addUser({
         variables: { ...userFormData },
       });
-    } catch (e) {
-      console.error(e);
+      const token = data?.addUser?.token;
+      if (token) {
+        Auth.login(token);
+      } else {
+        setShowAlert(true);
+      }
+    } catch (error) {
+      console.error(error);
       setShowAlert(true);
     }
   };
