@@ -8,21 +8,29 @@ const httpLink = createHttpLink({
 
 // Middleware that attaches the token to requests
 const authLink = setContext((_, { headers }) => {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('id_token') : null;
-  console.log('Token:', token); // Log the token
-  console.log('Headers before adding token:', headers); // Log headers before adding token
+  // Retrieve the token from local storage
+  const token = localStorage.getItem('id_token');
+  
+  // Log the token for debugging purposes
+  console.log('Token:', token); 
+
+  // Log headers before adding token for debugging purposes
+  console.log('Headers before adding token:', headers); 
+
+  // Attach the token to the request headers if it exists
   return {
     headers: {
       ...headers,
-      authorization: token ? `Bearer ${token}` : '',
+      authorization: token ? `Bearer ${token}` : '', // Attach token if available
     },
   };
 });
 
 // Apollo Client instance
 const client = new ApolloClient({
-  link: authLink.concat(httpLink),
+  link: authLink.concat(httpLink), // Combine authLink with httpLink
   cache: new InMemoryCache(),
 });
 
+// Exporting Apollo Provider and Apollo Client
 export { ApolloProvider, client };

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { LOGIN_USER } from '../graphql/mutations';
@@ -11,8 +11,11 @@ const LoginForm = () => {
 
   const [login, { error }] = useMutation(LOGIN_USER, {
     onCompleted: (data) => {
+      // Save the token upon successful login
       Auth.login(data.login.token);
-    }
+      // Optionally, save the token to local storage
+      localStorage.setItem('token', data.login.token);
+    },
   });
 
   const handleInputChange = (event) => {
@@ -23,11 +26,18 @@ const LoginForm = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
     try {
-      await login({
+      const { data } = await login({
         variables: { ...userFormData },
       });
-    } catch (e) {
-      console.error(e);
+      const token = data?.login?.token;
+      if (token) {
+        Auth.login(token);
+        localStorage.setItem('token', token); // Save token to local storage
+      } else {
+        setShowAlert(true);
+      }
+    } catch (error) {
+      console.error(error);
       setShowAlert(true);
     }
   };
@@ -41,7 +51,7 @@ const LoginForm = () => {
         <Form.Group className='mb-3'>
           <Form.Label htmlFor='email'>Email</Form.Label>
           <Form.Control
-            type='text'
+            type='email' // Change type to 'email'
             placeholder='Your email'
             name='email'
             onChange={handleInputChange}
