@@ -1,14 +1,17 @@
 import { ApolloClient, InMemoryCache, createHttpLink, ApolloProvider } from '@apollo/client';
 import { setContext } from '@apollo/client/link/context';
 
-// Define the GraphQL endpoint URI for local development and deployment
-const graphqlUri = process.env.NODE_ENV === 'production'
-  ? 'https://mern-book-search-engine-jv7d.onrender.com/graphql'
-  : 'http://localhost:3001/graphql';
+// Define the base URI for the GraphQL API
+let uri;
+if (process.env.NODE_ENV === 'production') {
+  uri = 'https://mern-book-search-engine-jv7d.onrender.com/graphql'; // Use relative path in production
+} else {
+  uri = 'http://localhost:3001/graphql'; // Use localhost in development
+}
 
 // Create an HTTP link to the GraphQL API
 const httpLink = createHttpLink({
-  uri: graphqlUri,
+  uri,
 });
 
 // Middleware that attaches the token to requests
