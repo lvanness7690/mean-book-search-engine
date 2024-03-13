@@ -24,6 +24,11 @@ async function startApolloServer(typeDefs, resolvers) {
   // Serve static assets from the client build folder
   app.use(express.static(path.join(__dirname, '../client/build')));
 
+  // Ensure that all requests not handled by Express return the React app
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+  });
+
   // Start the server
   db.once('open', () => {
     app.listen(PORT, () => console.log(`🌍 Now listening on port ${PORT}`));
