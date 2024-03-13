@@ -21,10 +21,8 @@ async function startApolloServer(typeDefs, resolvers) {
   app.use(express.urlencoded({ extended: true }));
   app.use(express.json());
 
-  if (process.env.NODE_ENV === 'production') {
-    // Serve static assets from the client build folder
-    app.use(express.static(path.join(__dirname, '../client/build')));
-  }
+  // Serve static assets from the client build folder
+  app.use(express.static(path.join(__dirname, '../client/build')));
 
   // Start the server
   db.once('open', () => {
