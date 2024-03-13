@@ -22,11 +22,11 @@ async function startApolloServer(typeDefs, resolvers) {
   app.use(express.json());
 
   // Serve static assets from the client build folder
-  app.use(express.static(path.join(__dirname, '../client/build')));
+  app.use(express.static(path.join(__dirname, '../client/dist')));
 
   // Ensure that all requests not handled by Express return the React app
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build/index.html'));
+    res.sendFile(path.join(__dirname, '../client/dist/index.html'));
   });
 
   // Start the server
