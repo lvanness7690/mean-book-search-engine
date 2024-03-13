@@ -1,10 +1,13 @@
-import ReactDOM from 'react-dom/client'
-import { createBrowserRouter, RouterProvider } from 'react-router-dom'
-import 'bootstrap/dist/css/bootstrap.min.css'
+// main.jsx
+import ReactDOM from 'react-dom/client';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { ApolloProvider } from '@apollo/client';
+import { client } from './utils/apollo'; // Adjust this path if necessary
+import 'bootstrap/dist/css/bootstrap.min.css';
 
-import App from './App.jsx'
-import SearchBooks from './pages/SearchBooks'
-import SavedBooks from './pages/SavedBooks'
+import App from './App';
+import SearchBooks from './pages/SearchBooks';
+import SavedBooks from './pages/SavedBooks';
 
 const router = createBrowserRouter([
   {
@@ -21,8 +24,11 @@ const router = createBrowserRouter([
       }
     ]
   }
-])
+]);
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <RouterProvider router={router} />
-)
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <ApolloProvider client={client}>
+    <RouterProvider router={router} />
+  </ApolloProvider>
+);
